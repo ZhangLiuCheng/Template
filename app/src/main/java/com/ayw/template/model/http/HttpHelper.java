@@ -51,6 +51,11 @@ public class HttpHelper implements IHttpProcessor {
         mHttpProcessor.post(url, getSignParams(params), callback);
     }
 
+    @Override
+    public void download(String url, IDownloadCallback callback) {
+        mHttpProcessor.download(url, callback);
+    }
+
     // 给请求参数签名
     private Map<String, String> getSignParams(Map<String ,String> params) {
         if (null != mHttpParamSign) {

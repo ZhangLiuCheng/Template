@@ -3,6 +3,7 @@ package com.ayw.template.model.http.impl;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.ayw.template.model.http.IHttpCallback;
 import com.ayw.template.model.http.IHttpProcessor;
@@ -45,7 +46,8 @@ public class OkHttpProcessor implements IHttpProcessor {
         if (null != params) {
             Set<Map.Entry<String, String>> entrySet = params.entrySet();
             for (Map.Entry<String, String> entry : entrySet) {
-                builder.add(entry.getKey(), entry.getValue());
+                String value = TextUtils.isEmpty(entry.getValue()) ? "" : entry.getValue();
+                builder.add(entry.getKey(), value);
             }
         }
         Request request = new Request.Builder()
