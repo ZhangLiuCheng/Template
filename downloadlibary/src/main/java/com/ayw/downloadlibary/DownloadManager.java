@@ -1,8 +1,6 @@
 package com.ayw.downloadlibary;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import java.io.File;
@@ -14,39 +12,43 @@ import java.util.concurrent.Executors;
 
 public class DownloadManager {
 
-    private static final class DownloadManagerHolder {
-        private static final DownloadManager INSTANCE = new DownloadManager();
-    }
-
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-
     private List<DownloadFile> mDownloadCallbacks = new ArrayList<>();
     private ExecutorService mExecutorService = Executors.newFixedThreadPool(5);
 
-    private Context context;
-    private FileProvider mFileProvider;
+    private IFileProvider mFileProvider;
 
-    public static void init(Context context) {
-        DownloadManager instance = getInstance();
-        instance.context = context;
-        instance.mFileProvider = new FileProvider(context);
+    private DownloadManager() {}
+
+    public static DownloadManager newInstance(Context context) {
+        DownloadManager instance = new DownloadManager();
+        instance.mFileProvider = new DefaultFileProvider(context);
+        return instance;
     }
 
-    public static DownloadManager getInstance() {
-        return DownloadManagerHolder.INSTANCE;
+    public static DownloadManager newInstance(IFileProvider fileProvider) {
+        DownloadManager instance = new DownloadManager();
+        instance.mFileProvider = fileProvider;
+        return instance;
     }
 
-    public void downloadUrl(String url, IDownloadCallback downCallback) {
+    public void downloadUrl(String url, File destFile, DownloadCallback downCallback) {
+        if (null == destFile) {
+            destFile =  mFileProvider.fetchFileByUrl(url);
+        }
         DownloadFile wrdf = getDownloadFile(url);
-        // 当前没有在下载中
-        if (null == wrdf) {
-            DownloadFile downloadFile = new DownloadFile(url,
-                    new ProxyCallback(downCallback), mFileProvider.fileByUrl(url));
+        TransferBack transferBack = new TransferBack(downCallback, mDownloadCallbacks, mFileProvider);
+        // 当前url在下载中
+        if (null != wrdf && destFile.getAbsolutePath().equals(wrdf.getDownloadFile().getAbsolutePath())) {
+            wrdf.addDownloadCallback(transferBack);
+        } else {
+            DownloadFile downloadFile = new DownloadFile(url, transferBack, destFile, mFileProvider.fetchHeaderByUrl(url));
             mDownloadCallbacks.add(downloadFile);
             mExecutorService.submit(downloadFile);
-        } else {
-            wrdf.addDownloadCallback(new ProxyCallback(downCallback));
         }
+    }
+
+    public void downloadUrl(String url, DownloadCallback downCallback) {
+        downloadUrl(url, null, downCallback);
     }
 
     public void pauseUrl(String url) {
@@ -55,10 +57,22 @@ public class DownloadManager {
         wrdf.pause();
     }
 
-    public void cancelUrl(String url) {
+    /**
+     * 取消下载.
+     * @param url
+     * @return false 当前没有下载中，true当前下载中.
+     */
+    public boolean cancelUrl(String url) {
         DownloadFile wrdf = getDownloadFile(url);
-        if (null == wrdf) return;
-        wrdf.cancel();
+        if (null == wrdf) {
+            // 已经下载完成或者没下载过，试着去删除文件
+            mFileProvider.deleteFileByUrl(url);
+            mFileProvider.deleteHeaderByUrl(url);
+            return false;
+        } else {
+            wrdf.cancel();
+        }
+        return true;
     }
 
     private DownloadFile getDownloadFile(String url) {
@@ -71,90 +85,5 @@ public class DownloadManager {
             }
         }
         return null;
-    }
-
-    private void removeDownloadUrl(String url) {
-        Iterator<DownloadFile> it = mDownloadCallbacks.iterator();
-        DownloadFile df;
-        while (it.hasNext()) {
-            df = it.next();
-            if (df.getDownloadUrl().equals(url)) {
-                it.remove();
-            }
-        }
-    }
-
-    private class ProxyCallback implements IDownloadCallback {
-
-        private final IDownloadCallback callback;
-
-        private ProxyCallback(IDownloadCallback callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        public void onStart(final String url) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onStart(url);
-                }
-            });
-        }
-
-        @Override
-        public void onLoading(final String url, final long bytesWritten, final long totalSize) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onLoading(url, bytesWritten, totalSize);
-                }
-            });
-        }
-
-        @Override
-        public void onPause(final String url) {
-            removeDownloadUrl(url);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onPause(url);
-                }
-            });
-        }
-
-        @Override
-        public void onCancel(final String url) {
-            removeDownloadUrl(url);
-            mFileProvider.deleteFileByUrl(url);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onCancel(url);
-                }
-            });
-        }
-
-        @Override
-        public void onSuccess(final String url, final File file) {
-            removeDownloadUrl(url);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onSuccess(url, file);
-                }
-            });
-        }
-
-        @Override
-        public void onFailure(final String url, final Exception ex) {
-            removeDownloadUrl(url);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onFailure(url, ex);
-                }
-            });
-        }
     }
 }

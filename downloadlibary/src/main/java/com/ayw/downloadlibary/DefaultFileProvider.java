@@ -1,27 +1,23 @@
 package com.ayw.downloadlibary;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-public class FileProvider {
+public class DefaultFileProvider implements IFileProvider {
 
     private Context context;
 
-    public FileProvider(Context context) {
+    public DefaultFileProvider(Context context) {
         this.context = context;
     }
 
-    /**
-     * 根据下载的url获取到下载的File.
-     * @param url
-     * @return
-     */
-    public File fileByUrl(String url) {
+    @Override
+    public File fetchFileByUrl(String url) {
         File path = getDownloadPath();
 
         String fileName;
@@ -37,21 +33,46 @@ public class FileProvider {
         return new File(path, fileName);
     }
 
-    /**
-     * 根据下载的url，删除对应的文件.
-     * @param url
-     */
+    @Override
     public void deleteFileByUrl(String url) {
-        File file = fileByUrl(url);
+        File file = fetchFileByUrl(url);
         if (file.exists()) {
             file.delete();
         }
     }
 
-    /**
-     * 清除下载文件.
-     */
-    public void clearFiles() {
+    @Override
+    public Header fetchHeaderByUrl(String url) {
+        String key = stringToMD5(url);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String etag = preferences.getString(key + "-etag", null);
+        String lastModify = preferences.getString(key+ "-lastModify", null);
+        if (TextUtils.isEmpty(etag) && TextUtils.isEmpty(lastModify)) {
+            return null;
+        }
+        return new Header(etag, lastModify);
+    }
+
+    @Override
+    public void saveHeaderByUrl(String url, Header header) {
+        String key = stringToMD5(url);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putString(key + "-etag", header.etag)
+                .putString(key + "-lastModify", header.lastModify)
+                .commit();
+    }
+
+    @Override
+    public void deleteHeaderByUrl(String url) {
+        String key = stringToMD5(url);
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.remove(key + "-etag")
+                .remove(key + "-lastModify")
+                .commit();
+    }
+
+    @Override
+    public void clearCache() {
 
     }
 
