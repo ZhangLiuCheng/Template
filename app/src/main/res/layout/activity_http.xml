@@ -10,14 +10,14 @@
     <android.support.v7.widget.AppCompatButton
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_marginTop="10dp"
-        android:onClick="http"
-        android:text="Http请求Demo" />
+        android:layout_marginTop="20dp"
+        android:onClick="request"
+        android:text="请求接口" />
 
-    <android.support.v7.widget.AppCompatButton
+    <TextView
+        android:id="@+id/result"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_marginTop="10dp"
-        android:onClick="download"
-        android:text="下载Demo" />
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp" />
+
 </LinearLayout>

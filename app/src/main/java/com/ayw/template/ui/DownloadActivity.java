@@ -1,9 +1,7 @@
 package com.ayw.template.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -16,6 +14,11 @@ import com.ayw.template.R;
 
 import java.io.File;
 
+/**
+ * 下载管理器
+ * 1.断点续传
+ * 2.通过eTag，lastModify等信息，当服务器资源改变时，取消断点，重新下载。
+ */
 public class DownloadActivity extends AppCompatActivity {
 
 //    private String url = "http://desk.fd.zol-img.com.cn/t_s1280x800c5/g5/M00/0B/06/ChMkJ1e8QY6IMCYBAAR5JMl8qw0AAUqwQKqAnIABHk8356.jpg?downfile=1498570780461.jpg";
@@ -35,14 +38,6 @@ public class DownloadActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress);
         state = (TextView) findViewById(R.id.state);
         path = (TextView) findViewById(R.id.filePath);
-
-        progressBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DownloadActivity.this, DownloadDetailActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     public void download(View view) {

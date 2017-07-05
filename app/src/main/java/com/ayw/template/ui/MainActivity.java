@@ -3,17 +3,9 @@ package com.ayw.template.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.ayw.downloadlibary.DownloadCallback;
-import com.ayw.downloadlibary.DownloadManager;
-import com.ayw.downloadlibary.IFileProvider;
 import com.ayw.template.R;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,28 +15,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    /*
-    public void request(View view) {
-        Map<String, String> params = new HashMap<>();
-        params.put("key", "value");
-        HttpHelper.obtian().post("http://www.baidu.com", params, new ResultCallback<String>() {
-            @Override
-            public void onSuccess(String s) {
-                TextView tv = (TextView) findViewById(R.id.result);
-                tv.setText("onSuccess :\r\n" + s);
-//                Log.v("TAG", "onSuccess  "  + s);
-            }
-
-            @Override
-            public void onFailure(Exception ex) {
-                Log.v("TAG", "onFailure  "  + ex);
-                TextView tv = (TextView) findViewById(R.id.result);
-                tv.setText("onFailure :\r\n" + ex.toString());
-            }
-        });
+    /**
+     * 网络层隔离
+     * 实现IHttpProcessor，可以切换网络请求的框架
+     * 实现IHttpParamSign，给请求http的参数签名
+     * 实现IResutConvert，过滤请求结果.
+     */
+    public void http(View view) {
+        Intent intent = new Intent(this, HttpActivity.class);
+        startActivity(intent);
     }
-    */
 
+    /**
+     * 下载管理器
+     * 1.断点续传
+     * 2.通过eTag，lastModify等信息，当服务器资源改变时，取消断点，重新下载。
+     */
     public void download(View view) {
         Intent intent = new Intent(this, DownloadActivity.class);
         startActivity(intent);

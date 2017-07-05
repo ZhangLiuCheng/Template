@@ -28,8 +28,9 @@
         <activity
             android:name=".ui.DownloadActivity"
             android:screenOrientation="portrait" />
+
         <activity
-            android:name=".ui.DownloadDetailActivity"
+            android:name=".ui.HttpActivity"
             android:screenOrientation="portrait" />
     </application>
 
