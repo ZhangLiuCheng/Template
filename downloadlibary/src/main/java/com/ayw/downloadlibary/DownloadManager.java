@@ -1,7 +1,6 @@
 package com.ayw.downloadlibary;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,12 +35,13 @@ public class DownloadManager {
             destFile =  mFileProvider.fetchFileByUrl(url);
         }
         DownloadFile wrdf = getDownloadFile(url);
-        TransferBack transferBack = new TransferBack(downCallback, mDownloadCallbacks, mFileProvider);
         // 当前url在下载中
         if (null != wrdf && destFile.getAbsolutePath().equals(wrdf.getDownloadFile().getAbsolutePath())) {
-            wrdf.addDownloadCallback(transferBack);
+            wrdf.getBridgeCallback().addDownloadCallback(downCallback);
         } else {
-            DownloadFile downloadFile = new DownloadFile(url, transferBack, destFile, mFileProvider.fetchHeaderByUrl(url));
+            BridgeCallback bridgeCallback = new BridgeCallback(downCallback, mDownloadCallbacks, mFileProvider);
+            DownloadFile downloadFile = new DownloadFile(url, bridgeCallback, destFile,
+                    mFileProvider.fetchHeaderByUrl(url));
             mDownloadCallbacks.add(downloadFile);
             mExecutorService.submit(downloadFile);
         }

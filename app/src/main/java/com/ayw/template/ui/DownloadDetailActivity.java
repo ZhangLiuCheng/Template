@@ -1,6 +1,5 @@
 package com.ayw.template.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,7 +15,7 @@ import com.ayw.template.R;
 
 import java.io.File;
 
-public class DownloadActivity extends AppCompatActivity {
+public class DownloadDetailActivity extends AppCompatActivity {
 
 //    private String url = "http://desk.fd.zol-img.com.cn/t_s1280x800c5/g5/M00/0B/06/ChMkJ1e8QY6IMCYBAAR5JMl8qw0AAUqwQKqAnIABHk8356.jpg?downfile=1498570780461.jpg";
     public static String url = "http://192.168.112.193:8080/App/Food.war";
@@ -35,14 +34,6 @@ public class DownloadActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress);
         state = (TextView) findViewById(R.id.state);
         path = (TextView) findViewById(R.id.filePath);
-
-        progressBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DownloadActivity.this, DownloadDetailActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     public void download(View view) {
@@ -64,6 +55,25 @@ public class DownloadActivity extends AppCompatActivity {
         progressBar.setProgress(0);
         path.setText("");
         state.setText("");
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        Log.v("TAG", "finish");
+        System.gc();
+        System.gc();
+        System.gc();
+        System.gc();
+        System.gc();
+
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        Log.v("TAG", "finalize");
+
     }
 
     private class MyDownloadCallback extends DownloadCallback {
@@ -96,7 +106,7 @@ public class DownloadActivity extends AppCompatActivity {
 
         @Override
         public void onFailure(String url, Exception ex) {
-            state.setText("下载失败:" + ex.toString());
+            state.setText("下载失败" + ex.getMessage());
         }
     }
 }
