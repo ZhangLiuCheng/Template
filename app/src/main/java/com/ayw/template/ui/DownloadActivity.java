@@ -21,8 +21,8 @@ import java.io.File;
  */
 public class DownloadActivity extends AppCompatActivity {
 
-//    private String url = "http://desk.fd.zol-img.com.cn/t_s1280x800c5/g5/M00/0B/06/ChMkJ1e8QY6IMCYBAAR5JMl8qw0AAUqwQKqAnIABHk8356.jpg?downfile=1498570780461.jpg";
-    public static String url = "http://192.168.112.193:8080/App/Food.war";
+    private String url = "http://desk.fd.zol-img.com.cn/t_s1280x800c5/g5/M00/0B/06/ChMkJ1e8QY6IMCYBAAR5JMl8qw0AAUqwQKqAnIABHk8356.jpg?downfile=1498570780461.jpg";
+//    public static String url = "http://192.168.112.193:8080/App/Food.war";
 
     private ProgressBar progressBar;
     private TextView state;

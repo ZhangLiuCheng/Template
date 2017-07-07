@@ -17,8 +17,10 @@ public class QyHttpParamSign implements IHttpParamSign {
     private String appId;
     private String privateKey;
 
-    public QyHttpParamSign(String appId, String privateKey, Context context) {
+    public QyHttpParamSign(Context context, String appId, String privateKey) {
         this.context = context;
+        this.appId = appId;
+        this.privateKey = privateKey;
     }
 
     @Override
