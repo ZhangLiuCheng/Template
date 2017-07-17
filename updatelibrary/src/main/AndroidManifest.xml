@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    package="com.ayw.updatelibrary">
+    package="com.zlc.updatelibrary">
 
     <application android:allowBackup="true" android:label="@string/app_name"
         android:supportsRtl="true">
 
-        <service android:name=".UpdateService"/>
+        <service android:name="com.zlc.updatelibrary.com.zlc.library.UpdateService"/>
     </application>
 
 </manifest>
