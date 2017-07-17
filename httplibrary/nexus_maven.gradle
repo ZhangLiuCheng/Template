@@ -3,16 +3,16 @@ apply plugin: 'maven'
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: 'http://47.52.47.166:8081/repository/DownloadLibrary/') {
+            repository(url: 'http://47.52.47.166:8081/repository/HttpLibrary/') {
                 authentication(userName: 'zhangliucheng', password: 'zlc!584670')
             }
             pom.project {
-                name 'DownloadLibrary'
+                name 'HttpLibrary'
                 groupId 'com.zlc.library'
-                artifactId 'dwonlaod'
+                artifactId 'http'
                 version '1.0.1'
                 packaging 'aar'
-                description '断点下载'
+                description '网络层隔离'
             }
         }
     }

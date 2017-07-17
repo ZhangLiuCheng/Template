@@ -9,9 +9,9 @@ import com.zlc.library.download.DownloadManager;
 import com.zlc.library.http.HttpHelper;
 import com.zlc.library.http.IHttpParamSign;
 import com.zlc.library.http.IResultConvert;
-import com.zlc.library.http.impl.OkHttpProcessor;
-import com.zlc.library.http.impl.QyHttpParamSign;
-import com.zlc.library.http.impl.QyResultConvert;
+import com.zlc.template.model.http.OkHttpProcessor;
+import com.zlc.template.model.http.QyHttpParamSign;
+import com.zlc.template.model.http.QyResultConvert;
 
 public class AywApplication extends Application implements Application.ActivityLifecycleCallbacks {
 

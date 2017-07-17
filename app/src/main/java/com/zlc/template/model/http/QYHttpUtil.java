@@ -1,16 +1,16 @@
-package com.zlc.library.http.impl;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
-import java.util.UUID;
+package com.zlc.template.model.http;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
+import java.util.UUID;
 
 public class QYHttpUtil {
 

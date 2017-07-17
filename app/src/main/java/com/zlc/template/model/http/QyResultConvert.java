@@ -1,9 +1,9 @@
-package com.zlc.library.http.impl;
+package com.zlc.template.model.http;
 
 import android.util.Log;
 
-import com.zlc.library.http.IResultConvert;
 import com.google.gson.Gson;
+import com.zlc.library.http.IResultConvert;
 
 import org.json.JSONObject;
 

@@ -1,4 +1,4 @@
-package com.zlc.library.http.impl;
+package com.zlc.template.model.http;
 
 import android.content.Context;
 import android.text.TextUtils;
