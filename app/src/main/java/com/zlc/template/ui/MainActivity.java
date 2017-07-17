@@ -25,9 +25,6 @@ import com.zlc.library.update.IUpdateListener;
 import com.zlc.library.update.UpdateManager;
 import com.zlc.library.update.UpdateService;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 public class MainActivity extends AppCompatActivity {
 
     static {

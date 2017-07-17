@@ -1,4 +1,4 @@
-package com.zlc.httplibrary;
+package com.zlc.library.download;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.ayw.httplibrary.test", appContext.getPackageName());
+        assertEquals("com.ayw.downloadlibary.test", appContext.getPackageName());
     }
 }

@@ -9,7 +9,7 @@ uploadArchives {
             pom.project {
                 name 'DownloadLibrary'
                 groupId 'com.zlc.library'
-                artifactId 'dwonlaod'
+                artifactId 'downlaod'
                 version '1.0.1'
                 packaging 'aar'
                 description '断点下载'
