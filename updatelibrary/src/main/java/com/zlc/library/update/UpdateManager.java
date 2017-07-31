@@ -1,6 +1,10 @@
 package com.zlc.library.update;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.io.File;
@@ -10,18 +14,19 @@ public class UpdateManager {
     public static final String TAG = "UPDATE_TAG";
 
     private static UpdateManager sInstance = new UpdateManager();
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private IUpdateNetwork updateNetwork;
     private IUpdateListener updateListener;
 
-    private Context context;
+    private Activity activity;
 
     private UpdateManager() {
         Log.v(TAG, "UpdateManager");
     }
 
-    public static UpdateManager init(Context context, IUpdateNetwork updateNetwork) {
-        sInstance.context = context;
+    public static UpdateManager init(Activity activity, IUpdateNetwork updateNetwork) {
+        sInstance.activity = activity;
         sInstance.updateNetwork = updateNetwork;
         return sInstance;
     }
@@ -33,22 +38,26 @@ public class UpdateManager {
         if (null == updateNetwork) {
             throw new RuntimeException("updateNetwork must not empty, please UpdateManager.init() first!");
         }
+        if (null == updateListener) {
+        }
         this.updateListener = updateListener;
         requestVersion();
     }
 
+    public void check() {
+        check(null);
+    }
+
     // 请求服务器最新版本.
     private void requestVersion() {
-        downloadApk(null);
-
         updateNetwork.version(new IUpdateNetwork.VersionListener() {
             @Override
             public void onSuccess(Version version) {
-                if (version.getVersionCode() <= UpdateUtil.getVersionCode(context)) {
+                if (version.getVersionCode() <= UpdateUtil.getVersionCode(activity)) {
                     updateListener.lastVersion();
                     return;
                 }
-                File apkFile = UpdateUtil.getApkFile(context, version);
+                File apkFile = UpdateUtil.getApkFile(activity, version);
                 if (apkFile.exists()) {
                     // 本地已经存在，安装apk.
                     verifyAndInstall(apkFile, version);
@@ -72,17 +81,48 @@ public class UpdateManager {
             public void run() {
                 String md5 = UpdateUtil.getFileMD5(apkFile);
                 if (version.getMd5().equals(md5)) {
-                    UpdateUtil.installApk(context, apkFile);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            infoUpdate(apkFile, version);
+                        }
+                    });
                 } else {
                     // md5不一样，删除本地，重新下载
                     apkFile.delete();
                     downloadApk(version);
+                    updateListener.onFailure(new Exception("md5验证不正确！"));
                 }
             }
         }).start();
     }
 
-    private void downloadApk(Version version) {
+    // 提示更新
+    private void infoUpdate(final File apkFile, Version version) {
+        updateListener.infoDailog(version.getTitle(), version.getMessage(), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                UpdateUtil.installApk(activity, apkFile);
+            }
+        }).show();
+    }
 
+    private void downloadApk(Version version) {
+        updateNetwork.downloadFile(version.getDownloadUrl(), new IUpdateNetwork.DownloadListener() {
+            @Override
+            public void onSuccess(File file) {
+
+            }
+
+            @Override
+            public void onFailure(Exception ex) {
+
+            }
+        });
     }
 }

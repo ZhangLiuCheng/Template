@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, getTest(), Toast.LENGTH_SHORT).show();
 
+        /**
         UpdateManager.init(this, new QyUpdateNetwork(this)).check(new IUpdateListener() {
             @Override
             public void lastVersion() {
@@ -60,6 +61,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+         */
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("UPDATE_TAG", "onDestroy");
     }
 
     public native String getTest();

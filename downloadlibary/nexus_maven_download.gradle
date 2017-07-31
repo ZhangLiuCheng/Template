@@ -3,7 +3,7 @@ apply plugin: 'maven'
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: 'http://47.52.47.166:8081/repository/DownloadLibrary/') {
+            repository(url: 'http://47.52.47.166:8080/nexus/content/repositories/DownloadLibrary/') {
                 authentication(userName: 'zhangliucheng', password: 'zlc!584670')
             }
             pom.project {

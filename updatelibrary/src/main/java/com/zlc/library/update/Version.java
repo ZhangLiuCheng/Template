@@ -1,8 +1,11 @@
 package com.zlc.library.update;
 
+import android.text.TextUtils;
+
 public class Version {
 
     private int versionCode;
+    private boolean isForce;    // 是否强制更新
     private String title;
     private String message;
     private String md5;         // 文件md5
@@ -15,6 +18,14 @@ public class Version {
 
     public void setVersionCode(int versionCode) {
         this.versionCode = versionCode;
+    }
+
+    public boolean isForce() {
+        return isForce;
+    }
+
+    public void setForce(boolean force) {
+        isForce = force;
     }
 
     public String getTitle() {
@@ -55,5 +66,12 @@ public class Version {
 
     public void setPatchUrl(String patchUrl) {
         this.patchUrl = patchUrl;
+    }
+
+    public String getDownloadUrl() {
+        if (!TextUtils.isEmpty(patchUrl)) {
+            return patchUrl;
+        }
+       return apkurl;
     }
 }
