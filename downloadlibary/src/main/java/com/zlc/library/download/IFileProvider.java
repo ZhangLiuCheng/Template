@@ -1,5 +1,7 @@
 package com.zlc.library.download;
 
+import android.text.TextUtils;
+
 import java.io.File;
 
 public interface IFileProvider {
@@ -11,6 +13,16 @@ public interface IFileProvider {
         public Header(String etag, String lastModify) {
             this.etag = etag;
             this.lastModify = lastModify;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (null == obj) return false;
+            if (!(obj instanceof IFileProvider)) return false;
+            Header dest = (Header) obj;
+            String destIfRange = TextUtils.isEmpty(dest.etag) ? dest.lastModify : dest.etag;
+            String sourceIfRange = TextUtils.isEmpty(etag) ? lastModify : etag;
+            return sourceIfRange.equals(destIfRange);
         }
     }
 
@@ -50,5 +62,5 @@ public interface IFileProvider {
     /**
      * 清除所有缓存.
      */
-    void clearCache();
+    boolean clearCache();
 }

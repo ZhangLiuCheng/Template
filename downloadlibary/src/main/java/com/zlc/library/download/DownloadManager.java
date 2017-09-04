@@ -30,10 +30,8 @@ public class DownloadManager {
         return instance;
     }
 
-    public void downloadUrl(String url, File destFile, DownloadCallback downCallback) {
-        if (null == destFile) {
-            destFile =  mFileProvider.fetchFileByUrl(url);
-        }
+    public void downloadUrl(String url, DownloadCallback downCallback) {
+        File destFile = mFileProvider.fetchFileByUrl(url);
         DownloadFile wrdf = getDownloadFile(url);
         // 当前url在下载中
         if (null != wrdf && destFile.getAbsolutePath().equals(wrdf.getDownloadFile().getAbsolutePath())) {
@@ -45,10 +43,6 @@ public class DownloadManager {
             mDownloadCallbacks.add(downloadFile);
             mExecutorService.submit(downloadFile);
         }
-    }
-
-    public void downloadUrl(String url, DownloadCallback downCallback) {
-        downloadUrl(url, null, downCallback);
     }
 
     public void pauseUrl(String url) {
@@ -73,6 +67,10 @@ public class DownloadManager {
             wrdf.cancel();
         }
         return true;
+    }
+
+    public boolean clearCache() {
+        return mFileProvider.clearCache();
     }
 
     private DownloadFile getDownloadFile(String url) {

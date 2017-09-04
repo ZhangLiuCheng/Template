@@ -44,7 +44,7 @@ public class DefaultFileProvider implements IFileProvider {
     @Override
     public Header fetchHeaderByUrl(String url) {
         String key = stringToMD5(url);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences preferences = getPreferences();
         String etag = preferences.getString(key + "-etag", null);
         String lastModify = preferences.getString(key+ "-lastModify", null);
         if (TextUtils.isEmpty(etag) && TextUtils.isEmpty(lastModify)) {
@@ -56,7 +56,7 @@ public class DefaultFileProvider implements IFileProvider {
     @Override
     public void saveHeaderByUrl(String url, Header header) {
         String key = stringToMD5(url);
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        SharedPreferences.Editor editor = getPreferences().edit();
         editor.putString(key + "-etag", header.etag)
                 .putString(key + "-lastModify", header.lastModify)
                 .commit();
@@ -65,20 +65,21 @@ public class DefaultFileProvider implements IFileProvider {
     @Override
     public void deleteHeaderByUrl(String url) {
         String key = stringToMD5(url);
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        SharedPreferences.Editor editor = getPreferences().edit();
         editor.remove(key + "-etag")
                 .remove(key + "-lastModify")
                 .commit();
     }
 
     @Override
-    public void clearCache() {
-
+    public boolean clearCache() {
+        getPreferences().edit().clear().commit();
+        return deleteDir(getDownloadPath());
     }
 
     private File getDownloadPath() {
         File downloadFile = context.getExternalFilesDir("download");
-        if (!downloadFile.exists()) {
+        if (null == downloadFile || !downloadFile.exists()) {
             File path = context.getFilesDir();
             downloadFile = new File(path + "download");
             if (!downloadFile.exists()) {
@@ -86,6 +87,23 @@ public class DefaultFileProvider implements IFileProvider {
             }
         }
         return downloadFile;
+    }
+
+    private boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+
+    private SharedPreferences getPreferences() {
+        return context.getSharedPreferences("download",Context.MODE_APPEND);
     }
 
     public static String stringToMD5(String string) {

@@ -12,10 +12,10 @@ import java.net.URL;
 
 public final class DownloadFile implements Runnable {
 
-    private String downloadUrl;
-    private BridgeCallback bridgeCallback;
-    private File downloadFile;
-    private IFileProvider.Header header;
+    private String mDownloadUrl;
+    private BridgeCallback mBridgeCallback;
+    private File mDownloadFile;
+    private IFileProvider.Header mHeader;
 
     private long length;
     private long offset;
@@ -24,23 +24,23 @@ public final class DownloadFile implements Runnable {
 
     public DownloadFile(String downloadUrl, BridgeCallback downloadCallback, File downloadFile,
                         IFileProvider.Header header) {
-        this.downloadUrl = downloadUrl;
-        this.bridgeCallback = downloadCallback;
-        this.downloadFile = downloadFile;
-        this.header = header;
+        this.mDownloadUrl = downloadUrl;
+        this.mBridgeCallback = downloadCallback;
+        this.mDownloadFile = downloadFile;
+        this.mHeader = header;
         offset = downloadFile.length();
     }
 
     public BridgeCallback getBridgeCallback() {
-        return bridgeCallback;
+        return mBridgeCallback;
     }
 
     public File getDownloadFile() {
-        return downloadFile;
+        return mDownloadFile;
     }
 
     public String getDownloadUrl() {
-        return downloadUrl;
+        return mDownloadUrl;
     }
 
     public void pause() {
@@ -56,30 +56,28 @@ public final class DownloadFile implements Runnable {
         InputStream is = null;
         RandomAccessFile fos = null;
         try {
-            if (downloadFile.exists()) {
-                if (downloadFile.length() > 0) {
-                    // 如果已经存在，直接下载完成
-                    offset = length = downloadFile.length();
-                    invokeDownloading();
-                    invokeDownloadFinish();
-                    return;
-                } else {
-                    downloadFile.delete();
-                }
+            if (mHeader != null && mDownloadFile.exists() && mDownloadFile.length() > 0) {
+                // 如果已经存在，直接下载完成
+                offset = length = mDownloadFile.length();
+                invokeDownloading();
+                invokeDownloadFinish();
+                return;
+            } else {
+                mDownloadFile.delete();
             }
-            File tempFile = new File(downloadFile.getAbsoluteFile() + ".temp");
+            File tempFile = new File(mDownloadFile.getAbsoluteFile() + ".temp");
             if (tempFile.exists()) {
                 offset = tempFile.length();
             } else {
                 tempFile.createNewFile();
             }
-            URL url = new URL(downloadUrl);
+            URL url = new URL(mDownloadUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
-            if (offset > 0 && null != header) {
+            if (offset > 0 && null != mHeader) {
                 conn.setRequestProperty("Range", "bytes=" + offset + "-");
-                String ifRange = TextUtils.isEmpty(header.etag) ? header.lastModify : header.etag;
+                String ifRange = TextUtils.isEmpty(mHeader.etag) ? mHeader.lastModify : mHeader.etag;
                 conn.setRequestProperty("If-Range", ifRange);
             }
             conn.connect();
@@ -87,22 +85,21 @@ public final class DownloadFile implements Runnable {
             if (200 == code) {
                 offset = 0;
             }
-            is = conn.getInputStream();
-            fos = new  RandomAccessFile(tempFile, "rw");
-            fos.seek(offset);	// 断点
             length = conn.getContentLength() + offset;
-
             String etag = conn.getHeaderField("ETag");
             String lastModify = conn.getHeaderField("Last-Modified");
             IFileProvider.Header header = new IFileProvider.Header(etag, lastModify);
             invokeDownloadBegin(header);					// 开始下载
 
+            is = conn.getInputStream();
+            fos = new  RandomAccessFile(tempFile, "rw");
+            fos.seek(offset);	// 断点
             byte [] buf  = new byte[1024 * 5];
             do {
                 int numread = is.read(buf);
                 offset += numread;
                 if (numread <= 0) {
-                    tempFile.renameTo(downloadFile);
+                    tempFile.renameTo(mDownloadFile);
                     invokeDownloadFinish();			// 下载完成
                     break;
                 }
@@ -127,32 +124,32 @@ public final class DownloadFile implements Runnable {
 
     // 回调开始下载
     private void invokeDownloadBegin(IFileProvider.Header header) {
-        bridgeCallback.onStart(downloadUrl, header);
+        mBridgeCallback.onStart(mDownloadUrl, header);
     }
 
     // 回调下载中
     private void invokeDownloading() {
-        bridgeCallback.onLoading(downloadUrl, offset, length);
+        mBridgeCallback.onLoading(mDownloadUrl, offset, length);
     }
 
     // 回调暂停中
     private void invokeDownloadPause() {
-        bridgeCallback.onPause(downloadUrl);
+        mBridgeCallback.onPause(mDownloadUrl);
     }
 
     // 回调取消中
     private void invokeDownloadCancel() {
-        bridgeCallback.onCancel(downloadUrl);
+        mBridgeCallback.onCancel(mDownloadUrl);
     }
 
     // 回调下载完成
     private void invokeDownloadFinish() {
-        bridgeCallback.onSuccess(downloadUrl, downloadFile);
+        mBridgeCallback.onSuccess(mDownloadUrl, mDownloadFile);
     }
 
     // 回调下载失败
     private void invokeDownloadFail(final Exception ex) {
-        bridgeCallback.onFailure(downloadUrl, ex);
+        mBridgeCallback.onFailure(mDownloadUrl, ex);
     }
 
     private void closeStream(Closeable...closable) {
