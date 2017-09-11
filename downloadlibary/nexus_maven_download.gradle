@@ -10,9 +10,9 @@ uploadArchives {
                 name 'DownloadLibrary'
                 groupId 'com.zlc.library'
                 artifactId 'downlaod'
-                version '1.0.1'
+                version '1.0.2'
                 packaging 'aar'
-                description '断点下载'
+                description '取消下载传入自定义路径'
             }
         }
     }

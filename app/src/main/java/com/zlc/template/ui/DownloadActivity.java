@@ -55,6 +55,10 @@ public class DownloadActivity extends AppCompatActivity {
         }
     }
 
+    public void clear(View view) {
+        downloadManager.clearCache();
+    }
+
     private void resetInfo() {
         progressBar.setProgress(0);
         path.setText("");

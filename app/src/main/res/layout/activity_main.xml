@@ -7,21 +7,21 @@
     android:orientation="vertical"
     tools:context="com.zlc.template.ui.MainActivity">
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginTop="10dp"
         android:onClick="http"
         android:text="Http请求Demo" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginTop="10dp"
         android:onClick="download"
         android:text="下载Demo" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginTop="10dp"
