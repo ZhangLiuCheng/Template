@@ -7,9 +7,13 @@ public abstract class ResultCallback<T> implements IHttpCallback {
 
     @Override
     public void onSuccess(String result) {
-        IResultConvert resultConvert = HttpHelper.obtian().getResultConvert();
         try {
-            T t = resultConvert.convert(analysisClassInfo(this), result);
+            Type type = analysisClassInfo(this);
+            IResultConvert resultConvert = HttpHelper.obtian().getResultConvert();
+            if (null == result) {
+                throw new RuntimeException("没有给HttpHelper设置IResultConvert");
+            }
+            T t = resultConvert.convert(type, result);
             onSuccess(t);
         } catch (Exception e) {
             onFailure(e);
@@ -18,9 +22,9 @@ public abstract class ResultCallback<T> implements IHttpCallback {
 
     public abstract void onSuccess(T result);
 
-    private Class<?> analysisClassInfo(Object objcet) {
+    private Type analysisClassInfo(Object objcet) {
         Type type = objcet.getClass().getGenericSuperclass();
         Type[] params = ((ParameterizedType) type).getActualTypeArguments();
-        return (Class<?>) params[0];
+        return params[0];
     }
 }

@@ -92,8 +92,9 @@ public class OkHttpProcessor implements IHttpProcessor {
         sb.append("?");
         Set<Map.Entry<String, String>> entrySet = params.entrySet();
         for (Map.Entry<String, String> entry : entrySet) {
-            sb.append(entry.getKey()).append("=").append(entry.getValue());
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
+        if (sb.length() > 0) sb.delete(sb.length() - 1, sb.length());
         return sb.toString();
     }
 

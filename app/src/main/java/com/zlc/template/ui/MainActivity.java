@@ -17,18 +17,31 @@ import android.util.Log;
 import android.view.InputEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zlc.library.http.HttpHelper;
+import com.zlc.library.http.ResultCallback;
 import com.zlc.template.QyUpdateNetwork;
 import com.zlc.template.R;
 import com.zlc.library.update.IUpdateListener;
 import com.zlc.library.update.UpdateManager;
 import com.zlc.library.update.UpdateService;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
     static {
         System.loadLibrary("native");
+    }
+
+    class P {
+        public int id;
+        public String label;
+        public String title;
     }
 
     @Override
@@ -37,6 +50,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Toast.makeText(this, getTest(), Toast.LENGTH_SHORT).show();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "12");
+        params.put("app_ids", "1");
+        HttpHelper.obtian().get("http://www.baidu.com", params,
+                new ResultCallback<String>() {
+            @Override
+            public void onSuccess(String s) {
+                Log.v("Qingyuan", "onSuccess  " + s.toString());
+            }
+
+            @Override
+            public void onFailure(Exception ex) {
+                Log.v("Qingyuan", "onFailure  " + ex.getMessage());
+            }
+        });
+
+
 
         /**
         UpdateManager.init(this, new QyUpdateNetwork(this)).check(new IUpdateListener() {

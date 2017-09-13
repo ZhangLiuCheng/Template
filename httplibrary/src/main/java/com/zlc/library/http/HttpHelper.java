@@ -14,20 +14,25 @@ public class HttpHelper implements IHttpProcessor {
 
     private HttpHelper() {}
 
-    public static void init(IHttpProcessor httpProcessor) {
-        mHttpProcessor = httpProcessor;
-    }
-
     /**
      * 初始化
      * @param httpProcessor 处理http的请求.
      * @param httpParamSign 处理请求参数的签名.
+     * @param resultConvert 处理请求结果转换成对象.
      */
     public static void init(IHttpProcessor httpProcessor, IHttpParamSign httpParamSign,
                             IResultConvert resultConvert) {
-        init(httpProcessor);
+        mHttpProcessor = httpProcessor;
         mHttpParamSign = httpParamSign;
         mResultConvert = resultConvert;
+    }
+
+    public static void init(IHttpProcessor httpProcessor, IResultConvert resultConvert) {
+        init(httpProcessor, null, resultConvert);
+    }
+
+    public static void init(IHttpProcessor httpProcessor) {
+        init(httpProcessor, null, null);
     }
 
     public static HttpHelper obtian() {

@@ -10,7 +10,7 @@ uploadArchives {
                 name 'HttpLibrary'
                 groupId 'com.zlc.library'
                 artifactId 'http'
-                version '1.0.1'
+                version '1.0.3'
                 packaging 'aar'
                 description '网络层隔离'
             }
