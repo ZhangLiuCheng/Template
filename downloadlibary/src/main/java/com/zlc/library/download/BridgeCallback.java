@@ -14,15 +14,15 @@ final class BridgeCallback extends DownloadCallback {
 
     private static final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private WeakReference<DownloadCallback> mSignCallback;
-    private List<WeakReference<DownloadCallback>> mMultCallbacks;
+    private DownloadCallback mSignCallback;
+    private List<DownloadCallback> mMultCallbacks;
 
     private List<DownloadFile> mDownloadFiles;
     private IFileProvider mFileProvider;
 
     public BridgeCallback(DownloadCallback callback, List<DownloadFile> downloadFiles,
                           IFileProvider fileProvider) {
-        this.mSignCallback = new WeakReference<>(callback);
+        this.mSignCallback = callback;
         this.mDownloadFiles = downloadFiles;
         this.mFileProvider = fileProvider;
     }
@@ -35,7 +35,7 @@ final class BridgeCallback extends DownloadCallback {
             mMultCallbacks.add(mSignCallback);
             mSignCallback = null;
         }
-        mMultCallbacks.add(new WeakReference<>(downloadCallback));
+        mMultCallbacks.add(downloadCallback);
     }
 
     @Override
@@ -82,19 +82,16 @@ final class BridgeCallback extends DownloadCallback {
     private void invokeCallbacks(String methodName, final Object[] args) {
         final Method method = getMethod(methodName);
         if (null == method) return;
-        if (null != mSignCallback && mSignCallback.get() != null) {
-            invokeOnUiThread(mSignCallback.get(), method, args);
+        if (null != mSignCallback) {
+            invokeOnUiThread(mSignCallback, method, args);
             return;
         }
         if (null == mMultCallbacks) return;
-        Iterator<WeakReference<DownloadCallback>> it = mMultCallbacks.iterator();
-        WeakReference<DownloadCallback> weakCallback;
+        Iterator<DownloadCallback> it = mMultCallbacks.iterator();
+        DownloadCallback callback;
         while (it.hasNext()) {
-            weakCallback = it.next();
-            final DownloadCallback callback = weakCallback.get();
-            if (callback != null) {
-                invokeOnUiThread(callback, method, args);
-            }
+            callback = it.next();
+            invokeOnUiThread(callback, method, args);
         }
     }
 
@@ -123,22 +120,12 @@ final class BridgeCallback extends DownloadCallback {
 
     private void clearCallbacks() {
         if (null != mSignCallback) {
-            if (mSignCallback.get() != null) {
-                mSignCallback.clear();
-            }
             mSignCallback = null;
         }
 
         if (null == mMultCallbacks) return;
-        Iterator<WeakReference<DownloadCallback>> it = mMultCallbacks.iterator();
-        WeakReference<DownloadCallback> weakCallback;
-        while (it.hasNext()) {
-            weakCallback = it.next();
-            if (weakCallback.get() != null) {
-                weakCallback.clear();
-            }
-        }
         mMultCallbacks.clear();
+        mMultCallbacks = null;
     }
 
     private void removeDownloadUrl(String url) {

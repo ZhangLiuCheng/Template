@@ -10,9 +10,9 @@ uploadArchives {
                 name 'DownloadLibrary'
                 groupId 'com.zlc.library'
                 artifactId 'downlaod'
-                version '1.0.3'
+                version '1.0.4'
                 packaging 'aar'
-                description 'fix bug'
+                description '下载BirdgeCallback里面去掉弱引用功能'
             }
         }
     }
