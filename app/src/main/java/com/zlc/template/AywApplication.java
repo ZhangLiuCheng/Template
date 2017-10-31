@@ -2,9 +2,12 @@ package com.zlc.template;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import com.zlc.library.download.DownloadManager;
 import com.zlc.library.http.HttpHelper;
 import com.zlc.library.http.IHttpParamSign;
@@ -30,7 +33,24 @@ public class AywApplication extends Application implements Application.ActivityL
 
         // 初始化DownloadMananger
         downloadManager = DownloadManager.newInstance(this);
+
+        initLeakCanary();
     }
+
+    public static RefWatcher getRefWatcher(Context context) {
+        AywApplication application = (AywApplication) context.getApplicationContext();
+        return application.refWatcher;
+    }
+
+    private RefWatcher refWatcher;
+    // 初始化内存泄漏监测
+    private void initLeakCanary() {
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return;
+        }
+        refWatcher = LeakCanary.install(this);
+    }
+
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
